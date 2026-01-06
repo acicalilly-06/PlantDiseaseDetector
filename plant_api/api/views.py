@@ -30,9 +30,18 @@ KEEP_HISTORY = False  # HARD RESET EACH TIME (Render-safe)
 # =====================================================
 # MODEL
 # =====================================================
+# api/views.py
+_model = None
 
-MODEL_PATH = os.path.join(settings.BASE_DIR, "ml", "leaf_disease_model.h5")
-MODEL = load_model(MODEL_PATH)
+def get_model():
+    global _model
+    if _model is None:
+        from tensorflow.keras.models import load_model
+        _model = load_model(
+            os.path.join(settings.BASE_DIR, "ml", "leaf_disease_model.h5")
+        )
+    return _model
+
 CLASSES = ["Healthy", "Powdery", "Rust"]
 
 # =====================================================
@@ -114,8 +123,11 @@ def compute_metrics(cm, label_index):
 
 
 def predict_disease(img_norm):
+    # ✅ Lazy-load model (NO global load)
+    model = get_model()
+
     img = np.expand_dims(img_norm, axis=0)
-    preds = MODEL.predict(img, verbose=0)[0]
+    preds = model.predict(img, verbose=0)[0]
 
     label_index = int(np.argmax(preds))
     confidence = float(preds[label_index])
@@ -125,7 +137,10 @@ def predict_disease(img_norm):
 
     for i in range(len(CLASSES)):
         for j in range(len(CLASSES)):
-            raw[i, j] = preds[i] * scale if i == j else preds[j] * scale / 6
+            if i == j:
+                raw[i, j] = preds[i] * scale
+            else:
+                raw[i, j] = preds[j] * scale / 6
 
     raw = np.clip(raw, 0, scale)
     cm_int = np.rint(raw).astype(int)
