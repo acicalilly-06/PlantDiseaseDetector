@@ -1,34 +1,22 @@
-# ============================================
-# 🌿 DJANGO CORE
-# ============================================
-Django
-gunicorn
-dj-database-url
-psycopg2-binary
+Django==4.2.11
+gunicorn==21.2.0
+dj-database-url==2.1.0
+psycopg2-binary==2.9.9
 
-# ============================================
-# ⚙️ REST & CORS
-# ============================================
-djangorestframework
-django-cors-headers
+djangorestframework==3.15.1
+django-cors-headers==4.3.1
 
-# ============================================
-# ☁️ CLOUDINARY MEDIA STORAGE
-# ============================================
-cloudinary
-django-cloudinary-storage
+cloudinary==1.36.0
+django-cloudinary-storage==0.3.0
 
-# ============================================
-# 🧠 MACHINE LEARNING / IMAGE PROCESSING
-# ============================================
-tensorflow
-opencv-python
-numpy
-scikit-image
+tensorflow==2.13.1
+keras==2.13.1
+numpy==1.24.4
+scipy==1.10.1
+h5py==3.8.0
+opencv-python==4.8.1.78
+scikit-image==0.21.0
 
-# ============================================
-# 🧩 UTILITIES (Recommended)
-# ============================================
-Pillow
-whitenoise
-python-dotenv
+Pillow==10.2.0
+whitenoise==6.6.0
+python-dotenv==1.0.1
