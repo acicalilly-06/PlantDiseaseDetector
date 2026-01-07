@@ -9,7 +9,6 @@ import numpy as np
 import cv2
 import os
 from uuid import uuid4
-from tensorflow.keras.models import load_model
 from skimage.feature import graycomatrix, graycoprops
 
 # =====================================================
