@@ -8,20 +8,24 @@ class PredictionRecord(models.Model):
     Works with Cloudinary (Render/Neon) or local storage (dev).
     """
 
+    # 🖼️ Image upload (auto handles local / Cloudinary)
     image = models.ImageField(
         upload_to="predictions/",
         help_text="Uploaded image (stored locally in dev, Cloudinary in prod)",
     )
 
+    # 🧠 Model result
     predicted_label = models.CharField(max_length=255)
     confidence = models.FloatField(help_text="Confidence score (0.0 - 1.0)")
 
+    # ⚙️ Model type (optional: CNN, SVM, etc.)
     model_type = models.CharField(max_length=50, default="CNN")
 
+    # 🕒 Timestamp for sorting / analytics
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-created_at"]  # newest first
         verbose_name = "Prediction Record"
         verbose_name_plural = "Prediction Records"
 
