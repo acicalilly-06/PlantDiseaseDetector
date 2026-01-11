@@ -1,53 +1,35 @@
-"""
-Django settings for plant_api project.
-"""
-
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-
-# ===========================================
-# 🔧 BASE CONFIG
-# ===========================================
+import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-dev-key")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-# ✅ Always True for offline local development
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# ✅ Allow all local connections (for emulator, LAN, etc.)
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"]
-
-# ===========================================
-# 📦 INSTALLED APPS
-# ===========================================
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
-    # Core Django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # Third-party
     "rest_framework",
     "corsheaders",
-
-    # Local apps
     "api",
 ]
 
-# ===========================================
-# ⚙️ MIDDLEWARE
-# ===========================================
-
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # must be first for CORS
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -58,10 +40,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "plant_api.urls"
-
-# ===========================================
-# 🎨 TEMPLATES
-# ===========================================
 
 TEMPLATES = [
     {
@@ -81,20 +59,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "plant_api.wsgi.application"
 
-# ===========================================
-# 🗄️ DATABASE (SQLite only — offline)
-# ===========================================
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
-
-# ===========================================
-# 🔒 PASSWORD VALIDATION
-# ===========================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -103,18 +74,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ===========================================
-# 🌍 INTERNATIONALIZATION
-# ===========================================
-
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = os.getenv("TIME_ZONE", "Asia/Kolkata")
+
 USE_I18N = True
 USE_TZ = True
-
-# ===========================================
-# 🖼️ STATIC & MEDIA (Local storage only)
-# ===========================================
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -122,12 +87,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# ✅ Always use local file storage — no Cloudinary or external service
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
 
-# ===========================================
-# 🧩 REST FRAMEWORK
-# ===========================================
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -135,16 +101,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ===========================================
-# 🔄 CORS (Allow everything for local dev)
-# ===========================================
-
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-
-# ===========================================
-# 🚀 DEBUG LOGGING (helpful in console)
-# ===========================================
 
 LOGGING = {
     "version": 1,
@@ -154,6 +112,6 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "DEBUG",  # changed to DEBUG for local visibility
+        "level": "INFO",
     },
 }
